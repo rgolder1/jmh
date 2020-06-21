@@ -3,6 +3,7 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org" level="WARN"/>
     <logger name="com" level="WARN"/>
+    <logger name="com.aztec" level="INFO"/>
     <logger name="org.h2" level="INFO"/>
     <logger name="org.hibernate" level="INFO"/>
     <!--    <logger name="org.springframework" level="TRACE"/>-->
