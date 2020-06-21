@@ -10,13 +10,13 @@ Compare the effect on performance of:
 - different database types
 - different WHERE and ORDER BY clauses
 
-## Running Benchmark Test
+## Running The Benchmark Test
 
 This demo uses SpringBoot tests such that the benchmarks execute against the application running as it would be normally.  Typically benchmark tests are not Springboot tests, which require autowiring of components such as the JdbcTemplate.   As such the usual suggested approach of using a main method in the BenchmarkBase class is not compatible with running as a SpringBoot test.
 
 Indeed the benchmark profile defined in the pom is not compatible with running as a SpringBoot test, but is left as reference as a standard approach for non-SpringBoot benchmark tests.
 
-Therefore run via the IDE.  Right click on the test class and select run test.  Alternatively right click on the executeJmhRunner() @Test method in BenchmarkBase, and select the actual test that is defined in a subclass to run.
+Therefore run via the IDE.  Right click on the test class and select Run test.  Alternatively right click on the executeJmhRunner() @Test method in BenchmarkBase, and select the actual test that is defined in a subclass to run.
 
 It can be run via maven with mvn clean test, however this takes a lot longer. 
 
@@ -40,7 +40,7 @@ At the end of the test the ./dockerStopPostgres.sh script can be used to stop an
 
 ### Viewing The Results
 
-Scroll to the bottom of the test run log output to view the benchmark results.  Or view the json file in the target dir.
+Scroll to the bottom of the test run log output to view the benchmark results.  Or view the json file generated in the target dir.
 
 ### Benchmarking Other Databases
 
