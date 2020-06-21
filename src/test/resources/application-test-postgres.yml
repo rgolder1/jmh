@@ -3,20 +3,19 @@ spring:
         name: jmh
 
     datasource:
-        url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=- 1;DB_CLOSE_ON_EXIT=FALSE;
-        driverClassName: org.h2.Driver
-        username: sa
-        password: ''
+        url: jdbc:postgresql://localhost:5432/jmh?currentSchema=jmh
+        driverClassName: org.postgresql.Driver
+        username: postgres
+        password: postgres
 
     jpa:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         hibernate:
-            default-schema: test
             hbm2ddl:
                 auto: create
         properties:
             hibernate:
-                default_schema: test
+                default_schema: jmh
         show_sql: true
 
 logging:

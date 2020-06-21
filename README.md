@@ -1,4 +1,4 @@
-# JMH benchmark library
+# JMH BBenchmark Library Demo
 
 Work in progress...
 
@@ -10,6 +10,7 @@ Compare the effect on performance of:
 
 - different database indexes
 - different database types
+- different WHERE and ORDER BY clauses
 
 ## Running Benchmark Test
 
@@ -17,16 +18,38 @@ This demo uses SpringBoot tests such that the benchmarks execute against the app
 
 Indeed the benchmark profile defined in the pom is not compatible with running as a SpringBoot test, but is left as reference as a standard approach for non-SpringBoot benchmark tests.
 
-Therefore run via the IDE.  Right click on the executeJmhRunner() @Test method, and select the actual test that is defined in a subclass to run.
+Therefore run via the IDE.  Right click on the test class and select run test.  Alternatively right click on the executeJmhRunner() @Test method in BenchmarkBase, and select the actual test that is defined in a subclass to run.
 
 It can be run via maven with mvn clean test, however this takes a lot longer. 
 
-## Running Against Postgres
+Configure properties in benchmark.properties, such as the number of iterations and number of concurrent threads to use.
 
-The SpringBoot test defines the database connection property overrides.  Comment these out to run against the default in-memory H2 database.  Leave the properties commented in to run against a Postgres instance.
+Change the database indexes to use in the test setup to compare performance.
 
-To start a Postgres instance running locally in a docker container, with Docker itself running locally, run the script in the root ./dockerBuildAndStart.sh
+## Running Against Different Database Types
 
-This will pull a base Postgres docker image, build, and start, with the benchmark.sql script included.  This script creates the schema and the event table that are required for the test.
+The application test properties files define the database connection properties for H2, Postgres and MySQL.  Uncomment the active-profile corresponding to the required database type that is defined at the top of the test class.  e.g. for Postgres use the profile "test-postgres". 
 
-At the end of the test runs the ./dockerStop.sh script can be used to stop and remove the Postgres docker container. 
+To start a Postgres instance running locally in a docker container, with Docker itself running locally, run the script in the root ./dockerBuildAndStartPostgres.sh
+
+This will pull a base Postgres docker image, build, and start, with the resources/postgres/benchmark.sql script included.  This script creates the schema and the event table that are required for the test.
+
+Likewise for a MySQL instance, run ./dockerBuildAndStartMySql.sh
+
+H2 is an in-memory database, so no docker container is applicable.
+
+At the end of the test the ./dockerStopPostgres.sh script can be used to stop and remove the Postgres docker container.  Likewise use ./dockerStopMySql.sh for MySQL. 
+
+### Viewing The Results
+
+Scroll to the bottom of the test run log output to view the benchmark results.  Or view the json file in the target dir.
+
+### Benchmarking Other Databases
+
+To benchmark performance against other databases:
+
+1. Create a Dockerfile and start up SQL file under the root resources/ dir for the database.
+1. Create a script in the root dir to pull and start a suitable docker container (similar to dockerBuildAndStartPostgres.sql).
+2. Create an application test properties file with the required connection properties (similar to application-test-postgres.yml).
+3. Set the active profile in the SpringBoot test class to pull in this properties file (similar to @ActiveProfiles("test-postgres")).
+4. Ensure the syntax for the create/drop indexes is correct in the test class. 

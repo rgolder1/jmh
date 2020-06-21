@@ -1,7 +1,9 @@
 #!/bin/bash -eu
 set -o pipefail
 
-docker build --no-cache -t postgres-jmh .
+# Postgres
+
+docker build --no-cache -t postgres-jmh -f ./resources/postgres/Dockerfile .
 
 docker images -a | grep postgres-jmh
 

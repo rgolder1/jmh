@@ -3,4 +3,5 @@ set -o pipefail
 
 docker stop postgres-jmh
 
-docker rm postgres-jmh
+# Optionally remove the container.
+#docker rm postgres-jmh

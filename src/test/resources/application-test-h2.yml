@@ -1,0 +1,26 @@
+spring:
+    application:
+        name: jmh
+
+    datasource:
+        url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=- 1;DB_CLOSE_ON_EXIT=FALSE;
+        driverClassName: org.h2.Driver
+        username: sa
+        password: ''
+
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        hibernate:
+            hbm2ddl:
+                auto: create
+        properties:
+            hibernate:
+                default_schema: jmh
+        show_sql: true
+
+logging:
+    level:
+        org.hibernate: INFO
+        com.aztec: INFO
+        org: WARN
+        com: WARN

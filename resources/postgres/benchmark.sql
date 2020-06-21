@@ -1,8 +1,8 @@
-CREATE SCHEMA IF NOT EXISTS test;
+CREATE SCHEMA IF NOT EXISTS jmh;
 
-DROP TABLE IF EXISTS test.event;
+DROP TABLE IF EXISTS jmh.event;
 
-create table test.event
+create table jmh.event
 (
     id uuid NOT NULL CONSTRAINT event_pkey PRIMARY KEY,
     destination VARCHAR(255),
