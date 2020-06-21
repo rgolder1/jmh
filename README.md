@@ -1,7 +1,5 @@
 # JMH Benchmark Library Demo
 
-Work in progress...
-
 ## Overview
 
 Demonstrate using the JMH benchmarking library with running SQL queries.
