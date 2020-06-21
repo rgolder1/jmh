@@ -1,4 +1,4 @@
-# JMH BBenchmark Library Demo
+# JMH Benchmark Library Demo
 
 Work in progress...
 
