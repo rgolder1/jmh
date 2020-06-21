@@ -1,0 +1,25 @@
+spring:
+    application:
+        name: jmh
+
+    datasource:
+        url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=- 1;DB_CLOSE_ON_EXIT=FALSE;
+        driverClassName: org.h2.Driver
+        username: sa
+        password: ''
+
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        hibernate:
+            default-schema: test
+            hbm2ddl:
+                auto: create
+        properties:
+            hibernate:
+                default_schema: test
+        show_sql: true
+
+logging:
+    level:
+        org.hibernate.SQL: DEBUG
+        org.hibernate.type.descriptor.sql: DEBUG
