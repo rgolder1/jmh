@@ -42,6 +42,9 @@ At the end of the test the ./dockerStopPostgres.sh script can be used to stop an
 
 Scroll to the bottom of the test run log output to view the benchmark results.  Or view the json file generated in the target dir.
 
+For a comparison of the SQL Selects test runs performed against different database types, with different indexes in place, see the results commented in the test class:
+[SqlQueryBenchmarkTest.java](./src/test/java/com/aztec/jmh/benchmark/SqlQueryBenchmarkTest.java)
+
 ### Benchmarking Other Databases
 
 To benchmark performance against other databases:
