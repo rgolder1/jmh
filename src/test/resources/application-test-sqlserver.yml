@@ -3,13 +3,13 @@ spring:
         name: jmh
 
     datasource:
-        url: jdbc:mysql://localhost:3306/jmh
-        driverClassName: com.mysql.jdbc.Driver
-        username: root
-        password: mysql
+        url: jdbc:sqlserver://localhost:1433;databaseName=tempdb
+        driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+        username: sa
+        password: SqlServer1!
 
     jpa:
-        database-platform: org.hibernate.dialect.MySQLDialect
+        database-platform: org.hibernate.dialect.SQLServer2012Dialect
         hibernate:
             hbm2ddl:
                 auto: create

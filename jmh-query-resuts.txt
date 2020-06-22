@@ -1,0 +1,102 @@
+-----------------------------
+SqlQueryBenchmarkTest RESULTS
+-----------------------------
+
+---------------
+100,000 records
+---------------
+
+Benchmark                                                            Mode  Cnt   Score   Error  Units
+
+No Index
+---------
+Postgres:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  3157.594 ± 5204.767  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  6113.633 ± 2552.801  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3051.708 ± 3292.223  ms/op
+MySQL:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3    3424.811 ±  6530.701  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  114706.894 ± 39915.799  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3    3899.692 ± 14866.878  ms/op
+SQLServer:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3    3454.698 ±  1800.951  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  111251.960 ± 44559.736  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3    4868.862 ± 12687.175  ms/op
+
+Index on timestamp
+------------------
+Postgres:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  3068.102 ± 4472.961  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  3081.664 ±  665.427  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3123.418 ± 3617.896  ms/op
+MySQL:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  4118.322 ±  9367.398  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  4091.860 ± 16355.127  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3569.499 ±  8474.834  ms/op
+SQLServer:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  3660.199 ± 4574.801  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  3727.329 ± 4560.402  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3897.438 ± 1367.412  ms/op
+
+Index on emitted
+----------------
+Postgres:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  3766.831 ± 4311.084  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  6706.881 ± 6019.995  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3667.853 ± 4711.994  ms/op
+MySQL:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3    3712.268 ±  15330.502  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  121423.434 ± 201579.898  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3    4273.896 ±   3520.437  ms/op
+SQLServer:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3    3845.094 ±  5466.670  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  105722.625 ± 85791.964  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3    4916.049 ± 11034.790  ms/op
+
+Index on timestamp and emitted
+------------------------------
+Postgres:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  3622.921 ±  3696.388  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  4171.187 ± 16121.616  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  4364.324 ± 17217.475  ms/op
+MySQL:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  6814.164 ± 12083.257  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  7055.684 ± 12303.446  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  6077.220 ± 15267.097  ms/op
+SQLServer:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  3928.037 ± 5645.576  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  4238.272 ± 3042.667  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3713.648 ± 2806.061  ms/op
+
+Composite index on timestamp and emitted
+----------------------------------------
+Postgres:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  4608.411 ± 16583.127  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  3689.193 ±  7773.964  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3248.135 ±  4586.935  ms/op
+MySQL:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  6194.516 ± 14395.790  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  4947.075 ± 11177.631  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  4115.813 ±  3585.003  ms/op
+SQLServer:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  4668.946 ± 6925.276  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  4699.406 ± 4400.897  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  4518.624 ± 1748.026  ms/op
+
+-----------------
+1,000,000 records
+-----------------
+
+No Index
+--------
+Postgres:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3   3364.005 ± 4000.857  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  32403.022 ± 1074.306  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3   3211.027 ± 2874.014  ms/op
+
+Index on timestamp:
+Postgres:
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmitted                  avgt    3  3314.176 ± 6644.598  ms/op
+SqlQueryBenchmarkTest.pollEventsSelectWhereEmittedOrderByTimestamp  avgt    3  3268.049 ± 2436.178  ms/op
+SqlQueryBenchmarkTest.pollEventsSelected                            avgt    3  3089.936 ±  933.160  ms/op
+

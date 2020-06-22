@@ -11,6 +11,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 abstract class BenchmarkBase {
@@ -34,6 +35,9 @@ abstract class BenchmarkBase {
                 .include("\\." + this.getClass().getSimpleName() + "\\.")
                 .warmupIterations(warmup)
                 .measurementIterations(iterations)
+                // single shot for each iteration:
+                .warmupTime(TimeValue.NONE)
+                .measurementTime(TimeValue.NONE)
                 // do not use forking or the benchmark methods will not see references stored within its class
                 .forks(0)
                 .threads(threads)
