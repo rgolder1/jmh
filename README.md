@@ -98,7 +98,7 @@ Each select is run a configurable number of times, based on the constant defined
 
 If we want to benchmark with a different index, uncomment as required, and run the test again.
 
-The benchmark results captured running the test against different databases with different indexed in place can be viewed in the file [jmh-query-results.txt](jmh-query-results.txt) in the root of the project.
+The benchmark results captured running the test against different databases with different indexed in place can be viewed in the file [jmh-query-results.txt](./jmh-query-results.txt) in the root of the project.
 
 ### SqlInsertBenchmarkTest
 
@@ -112,7 +112,7 @@ These events are then inserted into the database using the JPA repository.
     
 This list is reused for each benchmark iteration.  As the insert operation results in each event Id being set, the Ids are nulled so that new records are inserted, rather than existing records being updated. 
 
-The benchmark results captured running the test against different databases with different indexed in place can be viewed in the file [jmh-insert-results.txt](jmh-insert-results.txt) in the root of the project.
+The benchmark results captured running the test against different databases with different indexed in place can be viewed in the file [jmh-insert-results.txt](./jmh-insert-results.txt) in the root of the project.
 
 ## Benchmarking Other Databases
 
