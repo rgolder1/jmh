@@ -16,7 +16,7 @@ spring:
         properties:
             hibernate:
                 default_schema: jmh
-        show_sql: true
+        show_sql: false
 
 logging:
     level:

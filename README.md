@@ -10,21 +10,23 @@ The second goal is to create a project that uses JMH to enable me to easily test
 
 The final goal was to create a project that enables comparison of SQL running against different database types.  By default the project runs against the H2 database.  H2 is an open source lightweight in-memory database that can be embedded in Java applications, and therefore makes it the first choice for testing against as no extra infrastructure is required.  However the value comes when benchmarking performance against external running databases.  In this project I am pulling Postgres, MySQL and SQLServer database docker images, spinning these up in Docker, and hitting directly from the test.  The project is extensible making it easy to swap in further database types if desired.
 
-In summary this demonstration project provides a framework for capturing benchmarks to compare the effect on performance of:
+In summary, while the examples provided are trivial, this demonstration project provides a framework for capturing benchmarks to compare the effect on performance of:
 
 - different database indexes
 - different database types
-- different SELECT statement clauses
+- different SQL statements
 
 ## A Tour Of The Project
 
+#### Spring Boot Tests
+
 The benchmark test classes themselves are annotated with the usual @SpringBootTest / @RunWith(SpringRunner.class) annotations, and each pulls in the TestConfiguration which includes the test annotations such as @EnableJpaRepositories that are used to wire up our Spring components.  To that end there is a JpaRepository class, and a domain object, defined in src/main/java.  In these tests we are simulating storing and querying events in the database, and observing the performance of the queries and inserts.
+
+#### Active Profiles
 
 The @ActiveProfiles annotation is used to swap in the required database configuration properties.  For example, setting to @ActiveProfiles("test-postgres") will load the properties from src/test/resources/application-test-postgres.yml
 
-We also have a number of JMH specific class annotations such as @BenchmarkMode / @State.  Their usage is well documented in the JMH documentation so I will not cover that here.
-
-The tests extend the BenchmarkBase abstract class which is responsible for executing the JMH runner, which captures the results on the performance run.  This class enables properties to be overridden from the src/test/resources/benchmark.properties file, such as the number of warmup iterations, the number of actual test iterations, and the number of concurrent threads to use.  This is the standard JMH configuration which again is well documented in the JMH documentation.
+#### Dockerised Databases
 
 By default the tests run against H2, but more interesting is to run against external dockerised databases.  To this end there are scripts provided to build and start Postgres, MySQL and SQLServer.  With Docker running, in the root of the project run for example dockerBuildAndStartPostgres.sh.  This pulls a base Postgres docker image, builds, and starts, inserting an initialistion SQL script that runs when the database starts.  This script creates the schema and any tables that are required for the test.  The Dockerfile and SQL scripts for Postgres live under /resources/postgres/.  Likewise for MySQL, run ./dockerBuildAndStartMySql.sh, and for SQLServer run ./dockerBuildAndStartSqlServer.sh.  
 
@@ -32,13 +34,13 @@ Then configure the active profile for the respective database in the annotation 
 
 At the end of the test the ./dockerStopPostgres.sh script can be used to stop and optionally remove the Postgres docker container.  There are similar scripts for MySQL and SQLServer.
 
-To view the SQL being run by the test configure the following in the respective application properties file (noting that this will slow the test run down):
+#### JMH Benchmark Features
 
-    show_sql: true
+We also have a number of JMH specific class annotations such as @BenchmarkMode / @State.  Their usage is well documented in the JMH documentation so I will not cover that here.
 
-## A Note On Autowiring
+The tests extend the BenchmarkBase abstract class which is responsible for executing the JMH runner, which captures the results on the performance run.  This class enables properties to be overridden from the src/test/resources/benchmark.properties file, such as the number of warmup iterations, the number of actual test iterations, and the number of concurrent threads to use.  This is the standard JMH configuration which again is well documented in the JMH documentation.
 
-In order for the JMH framework to access the Spring classes they must be defined as static.  This means that when Spring autowires them for us, a static instance of the class must be instantiated.  Hence we define an @Autowired setter methods that do this:
+The JMH executor calls the benchmark methods from a static context.  As such any Spring classes used must be defined as static.  This means that when Spring autowires them for us, a static instance of the class must be instantiated.  Hence we define an @Autowired setter methods that do this:
 
 	private static EventRepository eventRepository;
 
@@ -46,6 +48,16 @@ In order for the JMH framework to access the Spring classes they must be defined
     public void setEventRepository(final EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     } 
+
+The @Setup annotations takes a parameter to determine whether the setup method should be called once for the full test (the default), or once before each iteration.  Use the following to run before each iteration:
+
+    @Setup(value = Iteration) 
+
+#### Viewing SQL
+
+To view the SQL being run by the test configure the following in the respective application properties file (noting that this will slow the test run down):
+
+    show_sql: true
 
 ## Running The Tests
 
@@ -72,7 +84,7 @@ This file can be published by a Jenkins build job, and so could be used to track
 
 As described above, choose the @ActiveProfile associated with the required database, and ensure the requisite docker container is running (unless using H2).
 
-The first thing each test does in the setup method is to clear any indexes from the database, as we will decide for the benchmark run which index(es) to use.  Different syntax is required to achieve this for different database types (e.g. 'IF NOT EXISTS' is not valid for MySQL indexes), and this is taken care of in the clearIndexes() method.  Note that this is a JMH @Setup annotation, not JUnit.
+The first thing each test does in the setup method is to drop any indexes from the database, as we will decide for the benchmark run which index(es) to use.  Note that this is a JMH @Setup annotation, not JUnit.  Different syntax is required to achieve this for different database types (e.g. 'IF NOT EXISTS' is not valid for MySQL indexes), and this is taken care of in the SqlUtils.dropIndexes(..) method.
 
 We decide which index if any to use by uncommenting the appropriates one(s), such as adding an index on timestamp.
 
@@ -98,21 +110,19 @@ Each select is run a configurable number of times, based on the constant defined
 
 If we want to benchmark with a different index, uncomment as required, and run the test again.
 
-The benchmark results captured running the test against different databases with different indexed in place can be viewed in the file [jmh-query-results.txt](./jmh-query-results.txt) in the root of the project.
+The benchmark results captured running the test against different databases with different indexes in place can be viewed in the file [jmh-query-results.txt](./jmh-query-results.txt) in the root of the project.
 
 ### SqlInsertBenchmarkTest
 
-This test first creates a list of events based on the configured event count:
-
-    private static final int EVENT_COUNT = 100000;
+This test first creates a list of events based on the configured event count in the constant at the top of the class.
 
 These events are then inserted into the database using the JPA repository. 
 
     eventRepository.saveAll(events);
     
-This list is reused for each benchmark iteration.  As the insert operation results in each event Id being set, the Ids are nulled so that new records are inserted, rather than existing records being updated. 
+A new list is used for each benchmark iteration to ensure that new records are inserted, rather than existing records being updated. 
 
-The benchmark results captured running the test against different databases with different indexed in place can be viewed in the file [jmh-insert-results.txt](./jmh-insert-results.txt) in the root of the project.
+The benchmark results captured running the test against different databases with different indexes in place can be viewed in the file [jmh-insert-results.txt](./jmh-insert-results.txt) in the root of the project.
 
 ## Benchmarking Other Databases
 

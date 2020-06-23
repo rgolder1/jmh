@@ -3,7 +3,7 @@ SqlInsertBenchmarkTest RESULTS
 ------------------------------
 
 ---------------
-50,000 records
+20,000 records
 ---------------
 
 Benchmark                             Mode  Cnt   Score   Error  Units
@@ -11,20 +11,26 @@ Benchmark                             Mode  Cnt   Score   Error  Units
 No Index
 ---------
 Postgres:
-SqlInsertBenchmarkTest.insertEvents  avgt    3  42885.591 ± 11873.679  ms/op
+SqlInsertBenchmarkTest.insertEvents  avgt    3  17541.165 ± 16700.752  ms/op
 MySQL:
-SqlInsertBenchmarkTest.insertEvents  avgt    3  98450.951 ± 48705.246  ms/op
+SqlInsertBenchmarkTest.insertEvents  avgt    3  33701.083 ± 53333.684  ms/op
+SQLServer:
+SqlInsertBenchmarkTest.insertEvents  avgt    3  26432.827 ± 13355.728  ms/op
 
 Index on timestamp
 ------------------
 Postgres:
-SqlInsertBenchmarkTest.insertEvents  avgt    3  53955.017 ± 141516.466  ms/op
+SqlInsertBenchmarkTest.insertEvents  avgt    3  17468.409 ± 15077.997  ms/op
 MySQL:
-SqlInsertBenchmarkTest.insertEvents  avgt    3  98139.428 ± 69636.628  ms/op
+SqlInsertBenchmarkTest.insertEvents  avgt    3  29185.551 ± 18434.476  ms/op
+SQLServer:
+SqlInsertBenchmarkTest.insertEvents  avgt    3  26187.106 ± 49261.417  ms/op
 
 Index on timestamp and emitted and composite index on both
 ----------------------------------------------------------
 Postgres:
-SqlInsertBenchmarkTest.insertEvents  avgt    3  40666.274 ± 13307.997  ms/op
+SqlInsertBenchmarkTest.insertEvents  avgt    3  16221.338 ± 10447.736  ms/op
 MySQL:
-SqlInsertBenchmarkTest.insertEvents  avgt    3  196937.003 ± 754403.865  ms/op
+SqlInsertBenchmarkTest.insertEvents  avgt    3  26761.457 ± 65866.028  ms/op
+SQLServer:
+SqlInsertBenchmarkTest.insertEvents  avgt    3  26064.802 ± 34658.744  ms/op

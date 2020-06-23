@@ -28,6 +28,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.openjdk.jmh.annotations.Level.Iteration;
+
 /**
  * Captures benchmark results for SQL inserts.
  *
@@ -48,12 +50,12 @@ public class SqlInsertBenchmarkTest extends BenchmarkBase {
     private static final Logger LOG = LoggerFactory.getLogger(SqlInsertBenchmarkTest.class);
 
     // The number of events to use for the test.
-    private static final int EVENT_COUNT = 50000;
+    private static final int EVENT_COUNT = 20000;
 
     private static JdbcTemplate jdbcTemplate;
     private static EventRepository eventRepository;
     private static String databaseUrl;
-    private List<Event> events = new ArrayList<>(EVENT_COUNT);
+    private List<Event> events;
 
     /**
      * We can check the URL to determine the db we are using for SQL syntax specific differences.
@@ -76,47 +78,44 @@ public class SqlInsertBenchmarkTest extends BenchmarkBase {
     /**
      * Set up a list of events ready to insert in the event table.
      *
+     * Clears down the table and creates a new list for each iteration to ensure the previously inserted events are not
+     * in fact being updated rather than newly inserted.
+     *
      * Uncomment any index(es) required for the test run.
+     *
+     * The Iteration level of the @Setup annotation means this method is run before each iteration.
      */
-    @Setup
+    @Setup(value = Iteration)
     public void setUp() {
-        clearIndexes();
-
         LOG.info("Deleting existing events.");
         eventRepository.deleteAllInBatch();
+        events = new ArrayList<>(EVENT_COUNT);
+
+        SqlUtils.dropIndexes(jdbcTemplate, databaseUrl, "idx_timestamp_on_event", "idx_emitted_on_event", "idx_timestamp_and_emitted_on_event");
 
         // Uncomment to add index(es) for a benchmark run.
 //        jdbcTemplate.execute("CREATE INDEX idx_timestamp_on_event ON jmh.event (timestamp)");
 //        jdbcTemplate.execute("CREATE INDEX idx_emitted_on_event ON jmh.event (emitted)");
 //        jdbcTemplate.execute("CREATE INDEX idx_timestamp_and_emitted_on_event ON jmh.event (timestamp, emitted)");
 
-        if(events.size() == EVENT_COUNT) {
-            LOG.info("There are the required {} events ready to insert.", EVENT_COUNT);
-            // Null out the IDs so that the events are written as new.
-            events.stream().parallel().forEach(event -> { event.setId(null); });
-            LOG.info("todo");
-        } else {
-            LOG.info("Creating list of {} events to insert.", EVENT_COUNT);
-            long timestamp = System.currentTimeMillis();
-            Random r = new Random();
-            IntStream.range(0, EVENT_COUNT)
-                    .forEach(i -> {
-                        Event event = new Event();
-                        event.setTimestamp(timestamp + r.nextInt(EVENT_COUNT));
-                        event.setEmitted(i % 2 == 0 ? true : false);
-                        event.setPayload(RandomStringUtils.randomAlphanumeric(4000));
-                        event.setDestination("topic_jmh-test");
-                        events.add(event);
-                    });
-            LOG.info("Created list of {} events ready to insert.", events.size());
-            assert events.size() == EVENT_COUNT;
-        }
+        LOG.info("Creating list of {} events to insert.", EVENT_COUNT);
+        long timestamp = System.currentTimeMillis();
+        Random r = new Random();
+        IntStream.range(0, EVENT_COUNT)
+                .forEach(i -> {
+                    Event event = new Event();
+                    event.setTimestamp(timestamp + r.nextInt(EVENT_COUNT));
+                    event.setEmitted(i % 2 == 0 ? true : false);
+                    event.setPayload(RandomStringUtils.randomAlphanumeric(4000));
+                    event.setDestination("topic_jmh-test");
+                    events.add(event);
+                });
+        LOG.info("Created list of {} events ready to insert.", events.size());
+        assert events.size() == EVENT_COUNT;
     }
 
     @Benchmark
     public void insertEvents(final Blackhole bh) {
-        // Null out the IDs so that the events are written as new.
-        events.stream().parallel().forEach(event -> { event.setId(null); });
         bh.consume(executeInsert(events));
     }
 
@@ -126,34 +125,5 @@ public class SqlInsertBenchmarkTest extends BenchmarkBase {
     private boolean executeInsert(final List<Event> events) {
         eventRepository.saveAll(events);
         return true;
-    }
-
-    /**
-     * Clear indexes at the outset of a run (and electively add them as required in Setup()).
-     */
-    private void clearIndexes() {
-        if(databaseUrl.contains("mysql")) {
-            // MySQL.
-            List<Map<String, Object>> results = jdbcTemplate.queryForList("SHOW INDEX FROM event");
-            if(results.stream().anyMatch(r -> r.get("Key_name").equals("idx_timestamp_on_event"))) {
-                jdbcTemplate.execute("ALTER TABLE event DROP INDEX idx_timestamp_on_event");
-            }
-            if(results.stream().anyMatch(r -> r.get("Key_name").equals("idx_emitted_on_event"))) {
-                jdbcTemplate.execute("ALTER TABLE event DROP INDEX idx_emitted_on_event");
-            }
-            if(results.stream().anyMatch(r -> r.get("Key_name").equals("idx_timestamp_and_emitted_on_event"))) {
-                jdbcTemplate.execute("ALTER TABLE event DROP INDEX idx_timestamp_and_emitted_on_event");
-            }
-        } else if(databaseUrl.contains("sqlserver")) {
-            // SQL Server.
-            jdbcTemplate.execute("DROP INDEX IF EXISTS jmh.event.idx_timestamp_on_event");
-            jdbcTemplate.execute("DROP INDEX IF EXISTS jmh.event.idx_emitted_on_event");
-            jdbcTemplate.execute("DROP INDEX IF EXISTS jmh.event.idx_timestamp_and_emitted_on_event");
-        } else {
-            // H2 and Postgres.
-            jdbcTemplate.execute("DROP INDEX IF EXISTS idx_timestamp_on_event");
-            jdbcTemplate.execute("DROP INDEX IF EXISTS idx_emitted_on_event");
-            jdbcTemplate.execute("DROP INDEX IF EXISTS idx_timestamp_and_emitted_on_event");
-        }
     }
 }

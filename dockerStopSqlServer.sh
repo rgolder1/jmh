@@ -3,5 +3,4 @@ set -o pipefail
 
 docker stop sqlserver-jmh
 
-# Optionally remove the container.
-#docker rm sqlserver-jmh
+docker rm sqlserver-jmh
