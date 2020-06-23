@@ -65,7 +65,7 @@ To view the SQL being run by the test configure the following in the application
 
 ## Running The Tests
 
-The easiest way to run the tests is to run  via the IDE.  Right click on the test class and select Run test.  The test can also be debugged this way if required.  Alternatively right click on the executeJmhRunner() @Test method in BenchmarkBase, and select the actual subclass test to run.
+The easiest way to run the tests is to run  via the IDE.  Right click on the test class and select Run test.  The test can also be debugged this way if required.  Alternatively right click on the executeJmhRunner() @Test method in BenchmarkBase, and select the subclass test to run from the dropdown.
 
 The tests can also be run via `mvn clean test`
 
@@ -90,11 +90,11 @@ As described above, choose the @ActiveProfile associated with the required datab
 
 The first thing each test does in the setup method is to drop any indexes from the database, as we will decide for the benchmark run which index(es) to use.  Note that this is a JMH @Setup annotation, not JUnit.  Different syntax is required to achieve this for different database types (e.g. 'IF NOT EXISTS' is not valid for MySQL indexes), and this is taken care of in the SqlUtils.dropIndexes(..) method.
 
-We decide which index if any to use by uncommenting the appropriates one(s), such as adding an index on timestamp.
+Decide which index if any to use by uncommenting the appropriates one(s), such as adding an index on timestamp.
 
 ### SqlQueryBenchmarkTest
  
-The test inserts 100,000 events in the database.  Change the constant at the top of the class to decide if fewer or more events are required.
+The test inserts 100,000 events in the database.  Change the constant at the top of the class to use fewer or more events as required.
 
     private static final int EVENT_COUNT = 100000;
 
@@ -130,7 +130,7 @@ The benchmark results captured running the test against different databases with
 
 ## Benchmarking Other Databases
 
-As mentioned the project can be extended to benchmark performance against other databases.  These are the steps to add a new database:
+The project can be easily extended to benchmark performance against other databases.  These are the steps to add a new database:
 
 1. Create a Dockerfile and start up scripts under the project root resources/ dir for the database.
 2. Create a script in the project root dir to pull and start a suitable docker container (similar to dockerBuildAndStartPostgres.sql).
