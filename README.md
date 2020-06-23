@@ -2,13 +2,13 @@
 
 ## Overview
 
-The JMH Microbenchmarking library provides a harness with which to run benchmark performance tests against your code.  The library is well documented with many good examples, so here I look at with a few specific goals in mind.
+The JMH Microbenchmarking library provides a harness with which to run benchmark performance tests against your code.  The library is well documented with many good examples, so here I look at it with a few specific goals in mind.
 
-First it is useful to be able to run benchmarks from within the context of a Spring Boot test.  This enables testing particular parts of the application as they run deployed in Production.  We get the full benefits of Spring's autowiring to pull in components just as the application does, such as a fully configured datasource, and no need to write all that boilerplate code ourselves.
+First it is useful to be able to run benchmarks from within the context of a Spring Boot test.  This enables testing particular parts of the application as they run deployed in Production.  We get the full benefits of Spring's autowiring to pull in components just as the application does, such as a fully configured datasource, and then there is no need to write all that boilerplate code ourselves.
 
-The second goal is to create a project that uses JMH to enable me to easily test the performance of SQL queries, in order to see the effect of small adjustments to the queries such as adding altering the WHERE or ORDER BY clauses.  And importantly, combining these adjustments with adding and removing indexes to the database.  While the impact of changes is usually obvious, being able to understand the precise cost can be very informative.  Adding an index to improve the performance of a read comes at the cost of the write to the same table, so it is often a trade off.  Then there are subtler differences that can be examined, such as the impact of adding an index on two columns compared to adding a single composite key index on the columns.
+The second goal is to create a project that uses JMH to enable easy performance testing of SQL queries, in order to see the effect of small adjustments to the queries such as adding altering the WHERE or ORDER BY clauses.  And importantly, combining these adjustments with adding and removing indexes to the database.  While the impact of changes is usually obvious, being able to understand the precise cost can be very informative.  Adding an index to improve the performance of a read might come at the cost of the write to the same table, so it is often a trade off.  Then there are subtler differences that can be examined, such as the impact of adding an index on two columns compared to adding a single composite key index on the columns.
 
-The final goal was to create a project that enables comparison of SQL running against different database types.  By default the project runs against the H2 database.  H2 is an open source lightweight in-memory database that can be embedded in Java applications, and therefore makes it the first choice for testing against as no extra infrastructure is required.  However the value comes when benchmarking performance against external running databases.  In this project I am pulling Postgres, MySQL and SQLServer database docker images, spinning these up in Docker, and hitting directly from the test.  The project is extensible making it easy to swap in further database types if desired.
+The final goal was to create a project that enables comparison of SQL running against different database types.  By default the project runs against the H2 database.  H2 is an open source lightweight in-memory database that can be embedded in Java applications, and therefore makes it the first choice for unit and integration testing against as no extra infrastructure is required.  However the value comes when benchmarking performance against external running databases, in particular that which is used in Production.  In this project I am pulling Postgres, MySQL and SQLServer database docker images, spinning these up in Docker, and hitting directly from the test.  The project is extensible making it easy to swap in further database types if desired.
 
 In summary, while the examples provided are trivial, this demonstration project provides a framework for capturing benchmarks to compare the effect on performance of:
 
@@ -20,25 +20,29 @@ In summary, while the examples provided are trivial, this demonstration project 
 
 #### Spring Boot Tests
 
-The benchmark test classes themselves are annotated with the usual @SpringBootTest / @RunWith(SpringRunner.class) annotations, and each pulls in the TestConfiguration which includes the test annotations such as @EnableJpaRepositories that are used to wire up our Spring components.  To that end there is a JpaRepository class, and a domain object, defined in src/main/java.  In these tests we are simulating storing and querying events in the database, and observing the performance of the queries and inserts.
+The benchmark test classes themselves are annotated with the usual @SpringBootTest / @RunWith(SpringRunner.class) annotations, and each pulls in the TestConfiguration which includes the test annotations such as @EnableJpaRepositories that are used to wire up our Spring components.  To that end there is a JpaRepository class, and a domain object, defined in src/main/java.  In these tests we are simulating inserting and querying events in the database, and observing the performance of the queries and inserts.
 
 #### Active Profiles
 
-The @ActiveProfiles annotation is used to swap in the required database configuration properties.  For example, setting to @ActiveProfiles("test-postgres") will load the properties from src/test/resources/application-test-postgres.yml
+The test class @ActiveProfiles annotation is used to swap in the required database configuration properties.  For example, setting to @ActiveProfiles("test-postgres") will load the properties from src/test/resources/application-test-postgres.yml
 
 #### Dockerised Databases
 
-By default the tests run against H2, but more interesting is to run against external dockerised databases.  To this end there are scripts provided to build and start Postgres, MySQL and SQLServer.  With Docker running, in the root of the project run for example dockerBuildAndStartPostgres.sh.  This pulls a base Postgres docker image, builds, and starts, inserting an initialistion SQL script that runs when the database starts.  This script creates the schema and any tables that are required for the test.  The Dockerfile and SQL scripts for Postgres live under /resources/postgres/.  Likewise for MySQL, run ./dockerBuildAndStartMySql.sh, and for SQLServer run ./dockerBuildAndStartSqlServer.sh.  
+To run a test against an external dockerised database, there are scripts provided to build and start Postgres, MySQL and SQLServer.  With Docker running, in the root of the project run for example dockerBuildAndStartPostgres.sh.  This pulls a base Postgres docker image, builds, and starts, inserting an initialistion SQL script that runs when the database starts.  This script creates the schema and any tables that are required for the test.  The Dockerfile and SQL scripts for Postgres live under /resources/postgres/.  Likewise for MySQL, run ./dockerBuildAndStartMySql.sh, and for SQLServer run ./dockerBuildAndStartSqlServer.sh.  
 
-Then configure the active profile for the respective database in the annotation at the top of the test class.
+Configure the active profile for the respective database in the annotation at the top of the test class.
 
-At the end of the test the ./dockerStopPostgres.sh script can be used to stop and optionally remove the Postgres docker container.  There are similar scripts for MySQL and SQLServer.
+At the end of the test the ./dockerStopPostgres.sh script can be used to stop and remove the Postgres docker container.  There are similar scripts for MySQL and SQLServer.
 
 #### JMH Benchmark Features
 
-We also have a number of JMH specific class annotations such as @BenchmarkMode / @State.  Their usage is well documented in the JMH documentation so I will not cover that here.
+There are a number of JMH specific class annotations in the tests such as @BenchmarkMode / @State.  Their usage is well documented in the JMH documentation so I will not cover those here.
 
-The tests extend the BenchmarkBase abstract class which is responsible for executing the JMH runner, which captures the results on the performance run.  This class enables properties to be overridden from the src/test/resources/benchmark.properties file, such as the number of warmup iterations, the number of actual test iterations, and the number of concurrent threads to use.  This is the standard JMH configuration which again is well documented in the JMH documentation.
+The tests extend the BenchmarkBase abstract class which is responsible for executing the JMH runner, which captures the results on the performance run.  This class enables properties such as the number of warmup iterations, the number of actual test iterations, and the number of concurrent threads to use. to be overridden from the benchmark properties file:
+
+    src/test/resources/benchmark.properties file
+    
+This is the standard JMH configuration which again is well documented in the JMH documentation.
 
 The JMH executor calls the benchmark methods from a static context.  As such any Spring classes used must be defined as static.  This means that when Spring autowires them for us, a static instance of the class must be instantiated.  Hence we define an @Autowired setter methods that do this:
 
@@ -49,13 +53,13 @@ The JMH executor calls the benchmark methods from a static context.  As such any
         this.eventRepository = eventRepository;
     } 
 
-The @Setup annotations takes a parameter to determine whether the setup method should be called once for the full test (the default), or once before each iteration.  Use the following to run before each iteration:
+One point to note is that the JMH @Setup annotations takes an optional parameter to determine whether the setup method should be called once for the full test (the default), or once before each iteration.  Use the following to run before each iteration:
 
     @Setup(value = Iteration) 
 
 #### Viewing SQL
 
-To view the SQL being run by the test configure the following in the respective application properties file (noting that this will slow the test run down):
+To view the SQL being run by the test configure the following in the application properties file for the respective database (noting that this will slow the test run down):
 
     show_sql: true
 
